@@ -78,9 +78,9 @@ public class BlueParking extends OpMode {
         double twist = gamepad1.right_stick_x * Constants.TwistSpeedReduction;
 
         if (RunTime.seconds() < 1) {
-            AsterionMotors.mecanumDrive(0.3, 0, 0);
+            AsterionMotors.mecanumDrive(-Constants.AutoSpeed, 0, 0);
         } else if (RunTime.seconds() > 1.5 && RunTime.seconds() < 4) {
-            AsterionMotors.mecanumDrive(0, 0.3,0);
+            AsterionMotors.mecanumDrive(0, Constants.AutoSpeed, 0);
         }
     }
 
