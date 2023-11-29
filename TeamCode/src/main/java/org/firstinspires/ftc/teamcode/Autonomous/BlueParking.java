@@ -18,7 +18,7 @@ import org.firstinspires.ftc.teamcode.Utilities.Color;
 import org.firstinspires.ftc.teamcode.Utilities.Constants.Constants;
 import org.firstinspires.ftc.teamcode.Subsystems.Drivetrain;
 
-@Autonomous(name="BP1-Parking")
+@Autonomous(name="RP1-Parking")
 
 public class BlueParking extends OpMode {
 
