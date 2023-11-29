@@ -20,7 +20,7 @@ import org.firstinspires.ftc.teamcode.Subsystems.Drivetrain;
 
 @Autonomous(name="RP1-Parking")
 
-public class BlueParking extends OpMode {
+public class RedParking extends OpMode {
 
     private Drivetrain AsterionMotors;
     private ElapsedTime RunTime = new ElapsedTime();
