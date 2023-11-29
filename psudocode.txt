@@ -1,0 +1,22 @@
+Drivetrain:
+ - getInstance (String flID, String frID, String blID, String brID)
+ - initEncoders (int COUNT_PER_MOTOR, int DRIVE_GEAR_REDUCTION, double WHEEL_DIAMETER_INCHES, COUNTS_PER_INCH)
+ - strafe (float x, float y)
+ - rotation (float x)
+ - switchInverted
+ 
+ - encoderDrive (int inches)
+ - encoderRotate (int direction)
+ 
+Lift:
+ - getInstance
+ - setLimits
+ - extend (float y)
+ - retrieve (float y)
+
+Drone Launcher:
+ - getInstance
+ - setAngle
+ - launchDrone 
+ 
+ 
