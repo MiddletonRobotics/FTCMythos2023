@@ -1,8 +1,33 @@
 package org.firstinspires.ftc.teamcode.Utilities;
 
+import com.qualcomm.hardware.lynx.LynxModule;
+import com.qualcomm.robotcore.hardware.Blinker;
+import com.qualcomm.robotcore.hardware.HardwareMap;
+
+import org.firstinspires.ftc.teamcode.Utilities.Constants.Constants;
+
 import java.math.BigInteger;
 
 public class Color {
+
+    private static  Blinker blinker;
+    private static LynxModule lynxModule;
+    private HardwareMap hardwareMap;
+
+    public LynxModule getLynxModule(HardwareMap aHardwareMap) {
+        hardwareMap = aHardwareMap;
+        lynxModule = hardwareMap.get(LynxModule.class, Constants.ControlHubID);
+
+        return lynxModule;
+    }
+
+    public Blinker getBlinker(HardwareMap aHardwareMap) {
+        hardwareMap = aHardwareMap;
+        blinker = hardwareMap.get(Blinker.class, Constants.ControlHubID);
+
+        return blinker;
+    }
+
     public static int hexToDecimal(String hexadecimal) {
         int ColorInt = Integer.parseInt(hexadecimal,16);
         return ColorInt;
