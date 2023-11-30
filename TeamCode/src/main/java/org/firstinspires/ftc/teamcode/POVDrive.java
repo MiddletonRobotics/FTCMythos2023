@@ -83,8 +83,6 @@ public class POVDrive extends OpMode {
         double drive = gamepad1.left_stick_y * ForwardSpeedReduction;
         double twist = gamepad1.right_stick_x * TwistSpeedReduction;
 
-        AsterionMotors.povDrive(drive, twist);
-
         if(gamepad1.dpad_up) {
             AsterionMotors.povDrive(Constants.DrivingAdjustment, 0);
         } else if(gamepad1.dpad_down) {
@@ -94,6 +92,8 @@ public class POVDrive extends OpMode {
         } else if(gamepad1.dpad_left) {
             AsterionMotors.povDrive(0, -Constants.DrivingAdjustment);
         }
+
+        AsterionMotors.povDrive(drive, twist);
 
         telemetry.addData("Status", "Run Time: " + RunTime.toString());
         telemetry.addData("Driving Speed", ForwardSpeedReduction);

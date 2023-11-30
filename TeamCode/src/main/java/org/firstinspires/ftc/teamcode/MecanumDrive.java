@@ -87,8 +87,6 @@ public class MecanumDrive extends OpMode {
         double strafe = gamepad1.left_stick_x * StrafeSpeedReduction;
         double twist = gamepad1.right_stick_x * TwistSpeedReduction;
 
-        AsterionMotors.mecanumDrive(drive, strafe, twist);
-
         if(gamepad1.dpad_up) {
             AsterionMotors.mecanumDrive(Constants.DrivingAdjustment, 0,0);
         } else if(gamepad1.dpad_down) {
@@ -98,6 +96,8 @@ public class MecanumDrive extends OpMode {
         } else if(gamepad1.dpad_left) {
             AsterionMotors.mecanumDrive(0, -Constants.DrivingAdjustment, 0);
         }
+
+        AsterionMotors.mecanumDrive(drive, strafe, twist);
 
         telemetry.addData("Status", "Run Time: " + RunTime.toString());
         telemetry.addData("Driving Speed", ForwardSpeedReduction);
