@@ -28,6 +28,10 @@ public class MecanumDrive extends OpMode {
     double StrafeSpeedReduction = 0.6;
     double TwistSpeedReduction = 0.6;
 
+    boolean leftBumperButtonPreviousState = false;
+    boolean rightBumperButtonPreviousState = false;
+    boolean slowModeActive = false;
+
     ArrayList<Blinker.Step> steps;
 
     @Override
@@ -58,7 +62,7 @@ public class MecanumDrive extends OpMode {
             steps.add(new Blinker.Step(orange, 3000, TimeUnit.MILLISECONDS));
             steps.add(new Blinker.Step(transparent, 3000, TimeUnit.MILLISECONDS));
 
-            ControlHub.setPattern(steps);
+            ControlHub.pushPattern(steps);
         }
     }
 
@@ -73,15 +77,18 @@ public class MecanumDrive extends OpMode {
 
     @Override
     public void loop() {
-        if(gamepad1.right_bumper && ForwardSpeedReduction < 1) {
-            ForwardSpeedReduction = ForwardSpeedReduction + 0.05;
-            StrafeSpeedReduction = StrafeSpeedReduction + 0.05;
-            TwistSpeedReduction = TwistSpeedReduction + 0.05;
-        } else if (gamepad1.left_bumper && ForwardSpeedReduction > 0) {
+        if(gamepad1.left_bumper && !leftBumperButtonPreviousState) {
             ForwardSpeedReduction = ForwardSpeedReduction - 0.05;
             StrafeSpeedReduction = StrafeSpeedReduction - 0.05;
             TwistSpeedReduction = TwistSpeedReduction - 0.05;
+        } else if(gamepad1.right_bumper && !rightBumperButtonPreviousState) {
+            ForwardSpeedReduction = ForwardSpeedReduction + 0.05;
+            StrafeSpeedReduction = StrafeSpeedReduction + 0.05;
+            TwistSpeedReduction = TwistSpeedReduction + 0.05;
         }
+
+        rightBumperButtonPreviousState = gamepad1.right_bumper;
+        leftBumperButtonPreviousState = gamepad1.left_bumper;
 
         double drive = gamepad1.left_stick_y * ForwardSpeedReduction;
         double strafe = gamepad1.left_stick_x * StrafeSpeedReduction;
