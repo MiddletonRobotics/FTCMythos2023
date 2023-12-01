@@ -7,7 +7,6 @@ public interface Constants {
     String FrontRightID = "FrontRight";
     String BackLeftID = "BackLeft";
     String BackRightID = "BackRight";
-
     String LiftMotorID = "LiftMotor";
 
     // String ArmMotorID = "ArmMotor";

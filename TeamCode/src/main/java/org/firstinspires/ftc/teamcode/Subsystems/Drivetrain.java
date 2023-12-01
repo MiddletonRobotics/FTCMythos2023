@@ -7,13 +7,12 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.teamcode.Utilities.Constants.Constants;
 
 public class Drivetrain {
-
     private DcMotor FrontLeft;
     private DcMotor FrontRight;
     private DcMotor RearLeft;
     private DcMotor RearRight;
 
-    DcMotor[] AsterionMotors;
+    public DcMotor[] AsterionMotors;
 
     private HardwareMap hardwareMap;
 
