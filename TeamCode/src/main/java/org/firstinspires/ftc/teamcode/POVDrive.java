@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
@@ -46,18 +47,22 @@ public class POVDrive extends OpMode {
         double batteryVoltage = Battery.getVoltage();
 
         if (batteryVoltage <= 11) {
-            int yellow = Color.hexToDecimal(Constants.YELLOW);
+            BigInteger yellowBigInteger = Color.hexToDecimal(Constants.YELLOW);
+            int yellow = yellowBigInteger.intValue();
             LED.setConstant(yellow);
             telemetry.addData("WARNING", "Battery Voltage is low");
         } else {
-            int orange = Color.hexToDecimal(Constants.ORANGE);
-            int transparent = Color.hexToDecimal(Constants.TRANSPARENT);
+            BigInteger orangeBigInteger = Color.hexToDecimal(Constants.ORANGE);
+            BigInteger transparentBigInteger = Color.hexToDecimal(Constants.TRANSPARENT);
+
+            int orange = orangeBigInteger.intValue();
+            int transparent = transparentBigInteger.intValue();
 
             steps = new ArrayList<Blinker.Step>();
             steps.add(new Blinker.Step(orange, 3000, TimeUnit.MILLISECONDS));
             steps.add(new Blinker.Step(transparent, 3000, TimeUnit.MILLISECONDS));
 
-            ControlHub.setPattern(steps);
+            ControlHub.pushPattern(steps);
         }
     }
 
@@ -66,7 +71,8 @@ public class POVDrive extends OpMode {
     public void start() {
         RunTime.reset();
 
-        int orange = Color.hexToDecimal(Constants.ORANGE);
+        BigInteger orangeBigInteger = Color.hexToDecimal(Constants.ORANGE);
+        int orange = orangeBigInteger.intValue();
         LED.setConstant(orange);
     }
 

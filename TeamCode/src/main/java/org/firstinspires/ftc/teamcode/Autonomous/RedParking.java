@@ -1,7 +1,8 @@
 package org.firstinspires.ftc.teamcode.Autonomous;
 
-// Temporary Color Library to see if mine works
+import android.graphics.Color;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -14,7 +15,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.hardware.Blinker;
 
-import org.firstinspires.ftc.teamcode.Utilities.Color;
+// import org.firstinspires.ftc.teamcode.Utilities.Color;
 import org.firstinspires.ftc.teamcode.Utilities.Constants.Constants;
 import org.firstinspires.ftc.teamcode.Subsystems.Drivetrain;
 
@@ -27,8 +28,7 @@ public class RedParking extends OpMode {
     private Blinker LED;
     private LynxModule ControlHub;
     private VoltageSensor Battery;
-
-    ArrayList<Blinker.Step> steps;
+    private Collection<Blinker.Step> steps;
 
     @Override
     public void init() {
@@ -40,6 +40,11 @@ public class RedParking extends OpMode {
         Battery = hardwareMap.get(VoltageSensor.class, Constants.ControlHubID);
         LED = hardwareMap.get(Blinker.class, Constants.ControlHubID);
         telemetry.addData("Status", "Initialized");
+
+        steps = new ArrayList<Blinker.Step>();
+        steps.add(new Blinker.Step(16740630, 400, TimeUnit.MILLISECONDS)); //red
+        steps.add(new Blinker.Step(android.graphics.Color.BLACK, 400, TimeUnit.MILLISECONDS)); //blue
+        ControlHub.setPattern(steps);
     }
 
     @Override
@@ -47,18 +52,8 @@ public class RedParking extends OpMode {
         double batteryVoltage = Battery.getVoltage();
 
         if (batteryVoltage <= 11) {
-            int yellow = org.firstinspires.ftc.teamcode.Utilities.Color.hexToDecimal(Constants.YELLOW);
-            LED.setConstant(yellow);
+            LED.setConstant(Color.YELLOW);
             telemetry.addData("WARNING", "Battery Voltage is low");
-        } else {
-            int orange = org.firstinspires.ftc.teamcode.Utilities.Color.hexToDecimal(Constants.ORANGE);
-            int transparent = org.firstinspires.ftc.teamcode.Utilities.Color.hexToDecimal(Constants.TRANSPARENT);
-
-            steps = new ArrayList<Blinker.Step>();
-            steps.add(new Blinker.Step(orange, 3000, TimeUnit.MILLISECONDS));
-            steps.add(new Blinker.Step(transparent, 3000, TimeUnit.MILLISECONDS));
-
-            ControlHub.setPattern(steps);
         }
     }
 
@@ -66,9 +61,6 @@ public class RedParking extends OpMode {
     @Override
     public void start() {
         RunTime.reset();
-
-        int orange = Color.hexToDecimal(Constants.ORANGE);
-        LED.setConstant(orange);
     }
 
     @Override
@@ -79,8 +71,11 @@ public class RedParking extends OpMode {
 
         if (RunTime.seconds() < 1) {
             AsterionMotors.mecanumDrive(-Constants.AutoSpeed, 0, 0);
-        } else if (RunTime.seconds() > 1.5 && RunTime.seconds() < 4) {
+        } else if (RunTime.seconds() > 1.5 && RunTime.seconds() < 5) {
             AsterionMotors.mecanumDrive(0, Constants.AutoSpeed, 0);
+        } else if (RunTime.seconds() > 5) {
+            AsterionMotors.mecanumDrive(0, 0, 0);
+            ControlHub.setPattern(steps);
         }
     }
 

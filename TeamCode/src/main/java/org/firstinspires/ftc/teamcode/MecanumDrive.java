@@ -1,18 +1,23 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.graphics.Color;
+
+import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.concurrent.TimeUnit;
 
+import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.hardware.Blinker;
-import com.qualcomm.hardware.lynx.LynxModule;
 
+// import org.firstinspires.ftc.teamcode.Utilities.Color;
 import org.firstinspires.ftc.teamcode.Utilities.Constants.Constants;
 import org.firstinspires.ftc.teamcode.Subsystems.Drivetrain;
-import org.firstinspires.ftc.teamcode.Utilities.Color;
 
 @TeleOp(name="Mecanum Driving")
 
@@ -30,7 +35,7 @@ public class MecanumDrive extends OpMode {
 
     boolean leftBumperButtonPreviousState = false;
     boolean rightBumperButtonPreviousState = false;
-    boolean slowModeActive = false;
+    boolean leftJoystickButtonPreviousState = false;
 
     ArrayList<Blinker.Step> steps;
 
@@ -44,6 +49,11 @@ public class MecanumDrive extends OpMode {
         Battery = hardwareMap.get(VoltageSensor.class, Constants.ControlHubID);
         LED = hardwareMap.get(Blinker.class, Constants.ControlHubID);
         telemetry.addData("Status", "Initialized");
+
+        steps = new ArrayList<Blinker.Step>();
+        steps.add(new Blinker.Step(16740630, 170, TimeUnit.MILLISECONDS)); //red
+        steps.add(new Blinker.Step(android.graphics.Color.BLACK, 170, TimeUnit.MILLISECONDS)); //blue
+        ControlHub.setPattern(steps);
     }
 
     @Override
@@ -51,18 +61,8 @@ public class MecanumDrive extends OpMode {
         double batteryVoltage = Battery.getVoltage();
 
         if (batteryVoltage <= 11) {
-            int yellow = Color.hexToDecimal(Constants.YELLOW);
-            LED.setConstant(yellow);
+            LED.setConstant(android.graphics.Color.YELLOW);
             telemetry.addData("WARNING", "Battery Voltage is low");
-        } else {
-            int orange = Color.hexToDecimal(Constants.ORANGE);
-            int transparent = Color.hexToDecimal(Constants.TRANSPARENT);
-
-            steps = new ArrayList<Blinker.Step>();
-            steps.add(new Blinker.Step(orange, 3000, TimeUnit.MILLISECONDS));
-            steps.add(new Blinker.Step(transparent, 3000, TimeUnit.MILLISECONDS));
-
-            ControlHub.pushPattern(steps);
         }
     }
 
@@ -70,9 +70,6 @@ public class MecanumDrive extends OpMode {
     @Override
     public void start() {
         RunTime.reset();
-
-        int orange = Color.hexToDecimal(Constants.ORANGE);
-        LED.setConstant(orange);
     }
 
     @Override
@@ -89,15 +86,16 @@ public class MecanumDrive extends OpMode {
 
         rightBumperButtonPreviousState = gamepad1.right_bumper;
         leftBumperButtonPreviousState = gamepad1.left_bumper;
+        leftJoystickButtonPreviousState = gamepad1.left_stick_button;
 
         double drive = gamepad1.left_stick_y * ForwardSpeedReduction;
         double strafe = gamepad1.left_stick_x * StrafeSpeedReduction;
         double twist = gamepad1.right_stick_x * TwistSpeedReduction;
 
         if(gamepad1.dpad_up) {
-            AsterionMotors.mecanumDrive(Constants.DrivingAdjustment, 0,0);
+            AsterionMotors.mecanumDrive(-Constants.DrivingAdjustment, 0,0);
         } else if(gamepad1.dpad_down) {
-            AsterionMotors.mecanumDrive(-Constants.DrivingAdjustment, 0, 0);
+            AsterionMotors.mecanumDrive(Constants.DrivingAdjustment, 0, 0);
         } else if(gamepad1.dpad_right) {
             AsterionMotors.mecanumDrive(0, Constants.DrivingAdjustment, 0);
         } else if(gamepad1.dpad_left) {
@@ -107,7 +105,11 @@ public class MecanumDrive extends OpMode {
         AsterionMotors.mecanumDrive(drive, strafe, twist);
 
         telemetry.addData("Status", "Run Time: " + RunTime.toString());
-        telemetry.addData("Driving Speed", ForwardSpeedReduction);
+        telemetry.addData("Speed Percentage", ForwardSpeedReduction * 100 + "%");
+        telemetry.addData("Driving Value", gamepad1.left_stick_y);
+        telemetry.addData("Strafing Value", gamepad1.left_stick_x);
+        telemetry.addData("Twist Value", gamepad1.right_stick_x);
+        telemetry.addData("Battery Voltage", Battery.getVoltage());
     }
 
     @Override

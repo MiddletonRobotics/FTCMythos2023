@@ -28,8 +28,8 @@ public class Color {
         return blinker;
     }
 
-    public static int hexToDecimal(String hexadecimal) {
-        int ColorInt = Integer.parseInt(hexadecimal,16);
+    public static BigInteger hexToDecimal(String hexadecimal) {
+        BigInteger ColorInt = new BigInteger(hexadecimal,16);
         return ColorInt;
     }
 
