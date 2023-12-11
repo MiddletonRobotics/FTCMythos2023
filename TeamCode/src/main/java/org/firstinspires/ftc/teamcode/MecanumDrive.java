@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.concurrent.TimeUnit;
 
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -29,13 +30,19 @@ public class MecanumDrive extends OpMode {
     private LynxModule ControlHub;
     private VoltageSensor Battery;
 
+    private DcMotor AngleMotor;
+    private DcMotor LiftMotor;
+
     double ForwardSpeedReduction = 0.6;
     double StrafeSpeedReduction = 0.6;
     double TwistSpeedReduction = 0.6;
+    double newTarget;
 
     boolean leftBumperButtonPreviousState = false;
     boolean rightBumperButtonPreviousState = false;
     boolean leftJoystickButtonPreviousState = false;
+    boolean aButtonPreviousState = false;
+    boolean bButtonPreviousState = false;
 
     ArrayList<Blinker.Step> steps;
 
@@ -48,6 +55,12 @@ public class MecanumDrive extends OpMode {
         ControlHub = hardwareMap.get(LynxModule.class, Constants.ControlHubID);
         Battery = hardwareMap.get(VoltageSensor.class, Constants.ControlHubID);
         LED = hardwareMap.get(Blinker.class, Constants.ControlHubID);
+        AngleMotor = hardwareMap.get(DcMotor.class, Constants.AngleMotorID)
+        LiftMotor = hardwareMap.get(DcMotor.class, Constants.LiftMotorID)
+
+        AngleMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        LiftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
         telemetry.addData("Status", "Initialized");
 
         steps = new ArrayList<Blinker.Step>();
@@ -102,6 +115,12 @@ public class MecanumDrive extends OpMode {
             AsterionMotors.mecanumDrive(0, -Constants.DrivingAdjustment, 0);
         }
 
+        if(gamepad2.a && !aButtonPreviousState) {
+            
+        } else if(gamepad2.b && !bButtonPreviousState) {
+            
+        }
+
         AsterionMotors.mecanumDrive(drive, strafe, twist);
 
         telemetry.addData("Status", "Run Time: " + RunTime.toString());
@@ -115,5 +134,19 @@ public class MecanumDrive extends OpMode {
     @Override
     public void stop() {
 
+    }
+
+    public void liftEncoder(int turnage) {
+        newTarget = Constants.ticks / turnage;
+        LiftMotor.setTargetPosition((int) newTarget)
+        LiftMotor.setPower(Constants.DrivingAdjustment);
+        LiftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION)
+    }
+
+    public void angleEncoder(int turnage) {
+        newTarget = Constants.ticks / turnage;
+        AngleMotor.setTargetPosition((int) newTarget)
+        AngleMotor.setPower(Constants.DrivingAdjustment);
+        AngleMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION)
     }
 }

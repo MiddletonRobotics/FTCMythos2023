@@ -8,6 +8,8 @@ public interface Constants {
     String BackLeftID = "BackLeft";
     String BackRightID = "BackRight";
     String LiftMotorID = "LiftMotor";
+    String AngleMotorID = "AngleMotor";
+    String LiftMotorID = "LiftMotor";
 
     // String ArmMotorID = "ArmMotor";
     // String AngleDroneID = "DroneLift";
@@ -18,6 +20,8 @@ public interface Constants {
     double TwistSpeedReduction = 0.45;
     double DrivingAdjustment = 0.4;
     double AutoSpeed = 0.2;
+
+    double ticks = 134.4;
 
     String RED = "ff0000";
     String ORANGE = "ff7116";
