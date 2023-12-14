@@ -1,8 +1,5 @@
 package org.firstinspires.ftc.teamcode;
 
-import android.graphics.Color;
-
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -10,6 +7,8 @@ import java.util.concurrent.TimeUnit;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.hardware.lynx.LynxModule;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.HardwareDevice;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -17,6 +16,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.hardware.Blinker;
 
 // import org.firstinspires.ftc.teamcode.Utilities.Color;
+import org.firstinspires.ftc.teamcode.Subsystems.Lift;
+import org.firstinspires.ftc.teamcode.Utilities.Color;
 import org.firstinspires.ftc.teamcode.Utilities.Constants.Constants;
 import org.firstinspires.ftc.teamcode.Subsystems.Drivetrain;
 
@@ -25,9 +26,11 @@ import org.firstinspires.ftc.teamcode.Subsystems.Drivetrain;
 public class MecanumDrive extends OpMode {
 
     private Drivetrain AsterionMotors;
+    private Lift ActuatorMotors;
     private ElapsedTime RunTime = new ElapsedTime();
     private Blinker LED;
     private LynxModule ControlHub;
+    private LynxModule ExpansionHub;
     private VoltageSensor Battery;
 
     private DcMotor AngleMotor;
@@ -36,7 +39,6 @@ public class MecanumDrive extends OpMode {
     double ForwardSpeedReduction = 0.6;
     double StrafeSpeedReduction = 0.6;
     double TwistSpeedReduction = 0.6;
-    double newTarget;
 
     boolean leftBumperButtonPreviousState = false;
     boolean rightBumperButtonPreviousState = false;
@@ -52,32 +54,23 @@ public class MecanumDrive extends OpMode {
         AsterionMotors.setOpposite(1);
         AsterionMotors.setBrakingMode("BRAKING");
 
+        ActuatorMotors = new Lift(hardwareMap);
+        ActuatorMotors.setBrakingMode("BRAKING");
+        // ActuatorMotors.setOpposite(1)
+
         ControlHub = hardwareMap.get(LynxModule.class, Constants.ControlHubID);
+        ExpansionHub = hardwareMap.get(LynxModule.class, Constants.ExpansionHubID);
         Battery = hardwareMap.get(VoltageSensor.class, Constants.ControlHubID);
         LED = hardwareMap.get(Blinker.class, Constants.ControlHubID);
-        AngleMotor = hardwareMap.get(DcMotor.class, Constants.AngleMotorID)
-        LiftMotor = hardwareMap.get(DcMotor.class, Constants.LiftMotorID)
 
-        AngleMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        LiftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        ControlHub.setPattern(Color.readyPattern());
+        ExpansionHub.setPattern(Color.readyPattern());
 
         telemetry.addData("Status", "Initialized");
-
-        steps = new ArrayList<Blinker.Step>();
-        steps.add(new Blinker.Step(16740630, 170, TimeUnit.MILLISECONDS)); //red
-        steps.add(new Blinker.Step(android.graphics.Color.BLACK, 170, TimeUnit.MILLISECONDS)); //blue
-        ControlHub.setPattern(steps);
     }
 
     @Override
-    public void init_loop() {
-        double batteryVoltage = Battery.getVoltage();
-
-        if (batteryVoltage <= 11) {
-            LED.setConstant(android.graphics.Color.YELLOW);
-            telemetry.addData("WARNING", "Battery Voltage is low");
-        }
-    }
+    public void init_loop() {}
 
 
     @Override
@@ -104,49 +97,29 @@ public class MecanumDrive extends OpMode {
         double drive = gamepad1.left_stick_y * ForwardSpeedReduction;
         double strafe = gamepad1.left_stick_x * StrafeSpeedReduction;
         double twist = gamepad1.right_stick_x * TwistSpeedReduction;
+        double lift = gamepad2.right_stick_y;
+        double angle = gamepad2.left_stick_y;
 
         if(gamepad1.dpad_up) {
-            AsterionMotors.mecanumDrive(-Constants.DrivingAdjustment, 0,0);
+            AsterionMotors.mecanumDrive(-Constants.DrivingAdjustment, 0,0, hardwareMap);
         } else if(gamepad1.dpad_down) {
-            AsterionMotors.mecanumDrive(Constants.DrivingAdjustment, 0, 0);
+            AsterionMotors.mecanumDrive(Constants.DrivingAdjustment, 0, 0, hardwareMap);
         } else if(gamepad1.dpad_right) {
-            AsterionMotors.mecanumDrive(0, Constants.DrivingAdjustment, 0);
+            AsterionMotors.mecanumDrive(0, Constants.DrivingAdjustment, 0, hardwareMap);
         } else if(gamepad1.dpad_left) {
-            AsterionMotors.mecanumDrive(0, -Constants.DrivingAdjustment, 0);
+            AsterionMotors.mecanumDrive(0, -Constants.DrivingAdjustment, 0, hardwareMap);
         }
 
-        if(gamepad2.a && !aButtonPreviousState) {
-            
-        } else if(gamepad2.b && !bButtonPreviousState) {
-            
-        }
+        aButtonPreviousState = gamepad2.a;
+        bButtonPreviousState = gamepad2.b;
 
-        AsterionMotors.mecanumDrive(drive, strafe, twist);
-
-        telemetry.addData("Status", "Run Time: " + RunTime.toString());
-        telemetry.addData("Speed Percentage", ForwardSpeedReduction * 100 + "%");
-        telemetry.addData("Driving Value", gamepad1.left_stick_y);
-        telemetry.addData("Strafing Value", gamepad1.left_stick_x);
-        telemetry.addData("Twist Value", gamepad1.right_stick_x);
+        ActuatorMotors.moveAngle(angle);
+        ActuatorMotors.moveLift(lift);
         telemetry.addData("Battery Voltage", Battery.getVoltage());
     }
 
     @Override
     public void stop() {
 
-    }
-
-    public void liftEncoder(int turnage) {
-        newTarget = Constants.ticks / turnage;
-        LiftMotor.setTargetPosition((int) newTarget)
-        LiftMotor.setPower(Constants.DrivingAdjustment);
-        LiftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION)
-    }
-
-    public void angleEncoder(int turnage) {
-        newTarget = Constants.ticks / turnage;
-        AngleMotor.setTargetPosition((int) newTarget)
-        AngleMotor.setPower(Constants.DrivingAdjustment);
-        AngleMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION)
     }
 }

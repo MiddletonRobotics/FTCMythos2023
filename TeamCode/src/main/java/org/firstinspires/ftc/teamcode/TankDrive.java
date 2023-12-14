@@ -15,9 +15,9 @@ import org.firstinspires.ftc.teamcode.Utilities.Constants.Constants;
 import org.firstinspires.ftc.teamcode.Subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.Utilities.Color;
 
-@TeleOp(name="POV Driving")
+@TeleOp(name="Tank Driving")
 
-public class POVDrive extends OpMode {
+public class TankDrive extends OpMode {
 
     private Drivetrain AsterionMotors;
     private ElapsedTime RunTime = new ElapsedTime();
@@ -60,20 +60,20 @@ public class POVDrive extends OpMode {
             TwistSpeedReduction = TwistSpeedReduction - 0.05;
         }
 
-        double drive = gamepad1.left_stick_y * ForwardSpeedReduction;
-        double twist = gamepad1.right_stick_x * TwistSpeedReduction;
+        double leftDrive = gamepad1.left_stick_y * ForwardSpeedReduction;
+        double rightDrive = gamepad1.right_stick_y * TwistSpeedReduction;
 
         if(gamepad1.dpad_up) {
-            AsterionMotors.povDrive(Constants.DrivingAdjustment, 0, hardwareMap);
+            AsterionMotors.tankDrive(Constants.DrivingAdjustment, Constants.DrivingAdjustment, hardwareMap);
         } else if(gamepad1.dpad_down) {
-            AsterionMotors.povDrive(-Constants.DrivingAdjustment, 0, hardwareMap);
+            AsterionMotors.tankDrive(-Constants.DrivingAdjustment, Constants.DrivingAdjustment, hardwareMap);
         } else if(gamepad1.dpad_right) {
-            AsterionMotors.povDrive(0, Constants.DrivingAdjustment, hardwareMap);
+            AsterionMotors.tankDrive(Constants.DrivingAdjustment, -Constants.DrivingAdjustment, hardwareMap);
         } else if(gamepad1.dpad_left) {
-            AsterionMotors.povDrive(0, -Constants.DrivingAdjustment, hardwareMap);
+            AsterionMotors.tankDrive(-Constants.DrivingAdjustment, -Constants.DrivingAdjustment, hardwareMap);
         }
 
-        AsterionMotors.povDrive(drive, twist, hardwareMap);
+        AsterionMotors.povDrive(leftDrive, rightDrive, hardwareMap);
 
         telemetry.addData("Status", "Run Time: " + RunTime.toString());
         telemetry.addData("Driving Speed", ForwardSpeedReduction);
