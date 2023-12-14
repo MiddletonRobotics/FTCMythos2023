@@ -70,11 +70,11 @@ public class RedParking extends OpMode {
         double twist = gamepad1.right_stick_x * Constants.TwistSpeedReduction;
 
         if (RunTime.seconds() < 1) {
-            AsterionMotors.mecanumDrive(-Constants.AutoSpeed, 0, 0);
+            AsterionMotors.mecanumDrive(-Constants.AutoSpeed, 0, 0, hardwareMap);
         } else if (RunTime.seconds() > 1.5 && RunTime.seconds() < 5) {
-            AsterionMotors.mecanumDrive(0, Constants.AutoSpeed, 0);
+            AsterionMotors.mecanumDrive(0, Constants.AutoSpeed, 0, hardwareMap);
         } else if (RunTime.seconds() > 5) {
-            AsterionMotors.mecanumDrive(0, 0, 0);
+            AsterionMotors.mecanumDrive(0, 0, 0, hardwareMap);
             ControlHub.setPattern(steps);
         }
     }
