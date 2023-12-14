@@ -7,8 +7,8 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.teamcode.Utilities.Constants.Constants;
 
 public class Lift {
-    private DcMotor LiftMotor;
-    private DcMotor AngleMotor;
+    private static DcMotor LiftMotor;
+    private static DcMotor AngleMotor;
     private HardwareMap hardwareMap;
 
     private DcMotor[] ActuatorMotors;
@@ -20,14 +20,19 @@ public class Lift {
         AngleMotor = hardwareMap.get(DcMotor.class, Constants.AngleMotorID);
         LiftMotor = hardwareMap.get(DcMotor.class, Constants.LiftMotorID);
 
+        AngleMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        LiftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
         ActuatorMotors = new DcMotor[]{AngleMotor, LiftMotor};
     }
 
     public void setOpposite(int number) {
         if (number == 0) {
             LiftMotor.setDirection(DcMotor.Direction.FORWARD);
+            AngleMotor.setDirection(DcMotorSimple.Direction.FORWARD);
         } else if (number == 1) {
             LiftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+            AngleMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         } else {
             throw new RuntimeException("Invalid parameter provided, setDirection() is only selective binary");
         }
@@ -43,17 +48,65 @@ public class Lift {
         }
     }
 
-    public void liftEncoder(int turnage) {
-        newTarget = Constants.ticks / turnage;
-        LiftMotor.setTargetPosition((int) newTarget)
-        LiftMotor.setPower(Constants.DrivingAdjustment);
-        LiftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION)
+    public void moveLift(double axis) {
+        if(axis > 0.1) {
+            LiftMotor.setPower(Constants.LiftSpeed);
+        } else if(axis < -0.1) {
+            LiftMotor.setPower(-Constants.LiftSpeed);
+        } else {
+            LiftMotor.setPower(0);
+        }
     }
 
-    public void angleEncoder(int turnage) {
-        newTarget = Constants.ticks / turnage;
-        AngleMotor.setTargetPosition((int) newTarget)
-        AngleMotor.setPower(Constants.DrivingAdjustment);
-        AngleMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION)
+    public void moveAngle(double axis) {
+        if(axis > 0.1) {
+            AngleMotor.setPower(Constants.AngleSpeed);
+        } else if(axis < -0.1) {
+            AngleMotor.setPower(-Constants.AngleSpeed);
+        } else {
+            AngleMotor.setPower(0);
+        }
     }
+
+    public void setHangingPosition() {
+        double angleTargetPosition = Constants.liftReadyPosition;
+        AngleMotor.setTargetPosition((int) angleTargetPosition);
+        AngleMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        AngleMotor.setPower(Constants.LiftSpeed);
+
+        double liftTargetPosition = Constants.liftExtendedPosition;
+        LiftMotor.setTargetPosition((int) liftTargetPosition);
+        LiftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        LiftMotor.setPower(Constants.LiftSpeed);
+    }
+
+    public void startHanging() {
+        LiftMotor.setTargetPosition(Constants.liftRetractedPosition);
+        LiftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        LiftMotor.setPower(Constants.LiftSpeed);
+    }
+
+    public void setIdlePositiion() {
+        AngleMotor.setTargetPosition(Constants.groundPosition);
+        AngleMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        AngleMotor.setPower(Constants.LiftSpeed);
+
+        LiftMotor.setTargetPosition(Constants.groundPosition);
+        LiftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        LiftMotor.setPower(Constants.LiftSpeed);
+    }
+
+    /*
+
+    public static int getLiftPosition() {
+        int telem = LiftMotor.getCurrentPosition();
+        return telem;
+    }
+
+    public int getAnglePosition() {
+        int telem = AngleMotor.getCurrentPosition();
+        return telem;
+    }
+
+    */
 }

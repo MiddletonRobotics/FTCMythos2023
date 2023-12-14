@@ -1,16 +1,25 @@
 package org.firstinspires.ftc.teamcode.Subsystems;
 
+import com.qualcomm.hardware.lynx.LynxModule;
+import com.qualcomm.robotcore.hardware.Blinker;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.VoltageSensor;
 
 import org.firstinspires.ftc.teamcode.Utilities.Constants.Constants;
+import org.firstinspires.ftc.teamcode.Utilities.Color;
+
+import java.util.ArrayList;
 
 public class Drivetrain {
     private DcMotor FrontLeft;
     private DcMotor FrontRight;
     private DcMotor RearLeft;
     private DcMotor RearRight;
+    private VoltageSensor Battery;
+    private LynxModule ExpansionHub;
+    private LynxModule ControlHub;
 
     public DcMotor[] AsterionMotors;
 
@@ -59,7 +68,7 @@ public class Drivetrain {
         }
     }
 
-    public void mecanumDrive(double drive, double strafe, double twist) {
+    public void mecanumDrive(double drive, double strafe, double twist, HardwareMap aHardwareMap) {
         double[] speeds = {
                 (drive - strafe - twist),
                 (drive + strafe + twist),
@@ -76,24 +85,70 @@ public class Drivetrain {
             for (int i = 0; i < speeds.length; i++) speeds[i] /= max;
         }
 
+        hardwareMap = aHardwareMap;
+        Battery = hardwareMap.get(VoltageSensor.class, Constants.ControlHubID);
+        ControlHub = hardwareMap.get(LynxModule.class, Constants.ControlHubID);
+        ExpansionHub = hardwareMap.get(LynxModule.class, Constants.ExpansionHubID);
+
+        double voltage = Battery.getVoltage();
+
+        if(voltage <= 11.5) {
+            ControlHub.setPattern(Color.batteryLowPattern());
+            ExpansionHub.setPattern(Color.batteryLowPattern());
+        } else {
+            ControlHub.setPattern(Color.teleopPattern());
+            ExpansionHub.setPattern(Color.teleopPattern());
+        }
+
         AsterionMotors[0].setPower(speeds[0]);
         AsterionMotors[1].setPower(speeds[1]);
         AsterionMotors[2].setPower(speeds[2]);
         AsterionMotors[3].setPower(speeds[3]);
     }
 
-    public void tankDrive(double leftDriveAxis, double rightDriveAxis) {
+    public void tankDrive(double leftDriveAxis, double rightDriveAxis, HardwareMap aHardwareMap) {
+
+        hardwareMap = aHardwareMap;
+        Battery = hardwareMap.get(VoltageSensor.class, Constants.ControlHubID);
+        ControlHub = hardwareMap.get(LynxModule.class, Constants.ControlHubID);
+        ExpansionHub = hardwareMap.get(LynxModule.class, Constants.ExpansionHubID);
+
+        double voltage = Battery.getVoltage();
+
+        if(voltage <= 11.5) {
+            ControlHub.setPattern(Color.batteryLowPattern());
+            ExpansionHub.setPattern(Color.batteryLowPattern());
+        } else {
+            ControlHub.setPattern(Color.teleopPattern());
+            ExpansionHub.setPattern(Color.teleopPattern());
+        }
+
         AsterionMotors[0].setPower(leftDriveAxis);
         AsterionMotors[1].setPower(rightDriveAxis);
         AsterionMotors[2].setPower(leftDriveAxis);
         AsterionMotors[3].setPower(rightDriveAxis);
     }
 
-    public void povDrive(double drive, double twist) {
+    public void povDrive(double drive, double twist, HardwareMap aHardwareMap) {
         double[] speeds = {
                 (drive + twist),
                 (drive - twist)
         };
+
+        hardwareMap = aHardwareMap;
+        Battery = hardwareMap.get(VoltageSensor.class, Constants.ControlHubID);
+        ControlHub = hardwareMap.get(LynxModule.class, Constants.ControlHubID);
+        ExpansionHub = hardwareMap.get(LynxModule.class, Constants.ExpansionHubID);
+
+        double voltage = Battery.getVoltage();
+
+        if(voltage <= 11.5) {
+            ControlHub.setPattern(Color.batteryLowPattern());
+            ExpansionHub.setPattern(Color.batteryLowPattern());
+        } else {
+            ControlHub.setPattern(Color.teleopPattern());
+            ExpansionHub.setPattern(Color.teleopPattern());
+        }
 
         AsterionMotors[0].setPower(speeds[1]);
         AsterionMotors[1].setPower(speeds[0]);
