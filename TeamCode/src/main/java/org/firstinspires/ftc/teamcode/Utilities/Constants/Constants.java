@@ -1,27 +1,46 @@
 package org.firstinspires.ftc.teamcode.Utilities.Constants;
 
+import com.qualcomm.hardware.motors.NeveRest20Gearmotor;
+
 public interface Constants {
+
+    // ANDYMARK NeveRest Orbital 20 Gearmotors
+
+    double ANO20_TICKS_PER_REVOLTUION = 537.6;
+    int ANO20_RPM = 340;
+
+    // ANDYMARK Orbital 3.7 Gearmotors
+
+    double AO3G_TICKS_PER_REVOLTUION = 103.6;
+    int AO3G_RPM = 1780;
+
+    // All IDs of electronics connected to the Control and Expansion Hub
     String ControlHubID = "Control Hub";
+    String ExpansionHubID = "Expansion Hub";
 
     String FrontLeftID = "FrontLeft";
     String FrontRightID = "FrontRight";
     String BackLeftID = "BackLeft";
     String BackRightID = "BackRight";
-    String LiftMotorID = "LiftMotor";
     String AngleMotorID = "AngleMotor";
     String LiftMotorID = "LiftMotor";
 
-    // String ArmMotorID = "ArmMotor";
-    // String AngleDroneID = "DroneLift";
-    // String OpenDroneID = "DroneRelease";
+    // Driving Speeds and Encoder Positions throughout the robot
 
     double ForwardSpeedReduction = 0.45;
     double StrafeSpeedReduction = 0.45;
     double TwistSpeedReduction = 0.45;
     double DrivingAdjustment = 0.4;
+    double LiftSpeed = 0.9;
+    double AngleSpeed = 0.4;
     double AutoSpeed = 0.2;
 
-    double ticks = 134.4;
+    int groundPosition = 0;
+    int liftRetractedPosition = 0;
+    double liftReadyPosition = ANO20_TICKS_PER_REVOLTUION / 0.4;
+    double liftExtendedPosition = ANO20_TICKS_PER_REVOLTUION * 11;
+
+    // Defining Colors for use to push patterns or colors to Control / Expansion Hub
 
     String RED = "ff0000";
     String ORANGE = "ff7116";
