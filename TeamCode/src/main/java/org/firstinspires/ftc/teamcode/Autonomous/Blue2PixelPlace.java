@@ -17,9 +17,9 @@ import org.firstinspires.ftc.teamcode.Utilities.Color;
 import org.firstinspires.ftc.teamcode.Utilities.Constants.Constants;
 import org.firstinspires.ftc.teamcode.Subsystems.Drivetrain;
 
-@Autonomous(name="BP1-Parking")
+@Autonomous(name="BP2-Pixel-Placement")
 
-public class BlueParking extends OpMode {
+public class Blue2PixelPlace extends OpMode {
 
     private Drivetrain AsterionMotors;
     private ElapsedTime RunTime = new ElapsedTime();
@@ -74,15 +74,13 @@ public class BlueParking extends OpMode {
             AsterionMotors.mecanumDrive(0, 0, 0);
         }  else if (RunTime.seconds() > 3.1 && RunTime.seconds() < 4.8) {
             AsterionMotors.mecanumDrive(Constants.AutoSpeed, 0, 0);
-        } else if (RunTime.seconds() > 4.8 && RunTime.seconds() < 5) {
-            AsterionMotors.mecanumDrive(0, 0, 0);
-        } else if (RunTime.seconds() > 5 && RunTime.seconds() < 9.2) {
-            AsterionMotors.mecanumDrive(0, -Constants.AutoSpeed, 0);
-        } else if (RunTime.seconds() > 9.2) {
+        } else if (RunTime.seconds() > 4.8) {
             AsterionMotors.mecanumDrive(0, 0, 0);
         }
     }
 
     @Override
-    public void stop() {}
+    public void stop() {
+
+    }
 }
