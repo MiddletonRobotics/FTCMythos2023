@@ -14,19 +14,19 @@ public class Color {
 
     private static Blinker blinker;
     private static LynxModule lynxModule;
-    private HardwareMap hardwareMap;
+    private static HardwareMap hardwareMap;
     private static ArrayList<Blinker.Step> steps;
 
-    public LynxModule getLynxModule(HardwareMap aHardwareMap) {
+    public static LynxModule getLynxModule(HardwareMap aHardwareMap, String id) {
         hardwareMap = aHardwareMap;
-        lynxModule = hardwareMap.get(LynxModule.class, Constants.ControlHubID);
+        lynxModule = hardwareMap.get(LynxModule.class, id);
 
         return lynxModule;
     }
 
-    public Blinker getBlinker(HardwareMap aHardwareMap) {
+    public static Blinker getBlinker(HardwareMap aHardwareMap, String id) {
         hardwareMap = aHardwareMap;
-        blinker = hardwareMap.get(Blinker.class, Constants.ControlHubID);
+        blinker = hardwareMap.get(Blinker.class, id);
 
         return blinker;
     }

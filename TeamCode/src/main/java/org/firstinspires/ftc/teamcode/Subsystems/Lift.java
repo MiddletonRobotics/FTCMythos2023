@@ -20,8 +20,8 @@ public class Lift {
         AngleMotor = hardwareMap.get(DcMotor.class, Constants.AngleMotorID);
         LiftMotor = hardwareMap.get(DcMotor.class, Constants.LiftMotorID);
 
-        AngleMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        LiftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        AngleMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        LiftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         ActuatorMotors = new DcMotor[]{AngleMotor, LiftMotor};
     }
@@ -87,11 +87,11 @@ public class Lift {
     }
 
     public void setIdlePositiion() {
-        AngleMotor.setTargetPosition(Constants.groundPosition);
+        AngleMotor.setTargetPosition(Constants.liftIdlePosition);
         AngleMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         AngleMotor.setPower(Constants.LiftSpeed);
 
-        LiftMotor.setTargetPosition(Constants.groundPosition);
+        LiftMotor.setTargetPosition(Constants.liftRetractedPosition);
         LiftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         LiftMotor.setPower(Constants.LiftSpeed);
     }
