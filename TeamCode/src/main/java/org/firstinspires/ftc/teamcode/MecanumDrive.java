@@ -1,21 +1,15 @@
 package org.firstinspires.ftc.teamcode;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.concurrent.TimeUnit;
 
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.hardware.lynx.LynxModule;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.HardwareDevice;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.hardware.Blinker;
 
-// import org.firstinspires.ftc.teamcode.Utilities.Color;
 import org.firstinspires.ftc.teamcode.Subsystems.Lift;
 import org.firstinspires.ftc.teamcode.Utilities.Color;
 import org.firstinspires.ftc.teamcode.Utilities.Constants.Constants;
@@ -32,9 +26,7 @@ public class MecanumDrive extends OpMode {
     private LynxModule ControlHub;
     private LynxModule ExpansionHub;
     private VoltageSensor Battery;
-
-    private DcMotor AngleMotor;
-    private DcMotor LiftMotor;
+    private Servo DroneLauncher;
 
     double ForwardSpeedReduction = 0.6;
     double StrafeSpeedReduction = 0.6;
@@ -58,24 +50,35 @@ public class MecanumDrive extends OpMode {
         ActuatorMotors.setBrakingMode("BRAKING");
         // ActuatorMotors.setOpposite(1)
 
-        ControlHub = hardwareMap.get(LynxModule.class, Constants.ControlHubID);
-        ExpansionHub = hardwareMap.get(LynxModule.class, Constants.ExpansionHubID);
+        ControlHub = Color.getLynxModule(hardwareMap, Constants.ControlHubID);
+        ExpansionHub = Color.getLynxModule(hardwareMap, Constants.ExpansionHubID);
         Battery = hardwareMap.get(VoltageSensor.class, Constants.ControlHubID);
         LED = hardwareMap.get(Blinker.class, Constants.ControlHubID);
 
-        ControlHub.setPattern(Color.readyPattern());
-        ExpansionHub.setPattern(Color.readyPattern());
+        DroneLauncher = hardwareMap.get(Servo.class, Constants.DroneLauncherID);
 
-        telemetry.addData("Status", "Initialized");
+        if(Battery.getVoltage() < 11.7) {
+            telemetry.addData("WARNING", "Battery Voltage is low!");
+            ControlHub.setPattern(Color.batteryLowPattern());
+            ExpansionHub.setPattern(Color.batteryLowPattern());
+        } else {
+            telemetry.addData("Status", "Initialized");
+            telemetry.addData("Battery Voltage", Battery.getVoltage());
+
+            ControlHub.setPattern(Color.readyPattern());
+            ExpansionHub.setPattern(Color.readyPattern());
+        }
     }
 
     @Override
     public void init_loop() {}
 
-
     @Override
     public void start() {
         RunTime.reset();
+
+        ControlHub.setPattern(Color.teleopPattern());
+        ExpansionHub.setPattern(Color.teleopPattern());
     }
 
     @Override
@@ -101,13 +104,21 @@ public class MecanumDrive extends OpMode {
         double angle = gamepad2.left_stick_y;
 
         if(gamepad1.dpad_up) {
-            AsterionMotors.mecanumDrive(-Constants.DrivingAdjustment, 0,0, hardwareMap);
+            AsterionMotors.mecanumDrive(-Constants.DrivingAdjustment, 0,0, false);
         } else if(gamepad1.dpad_down) {
-            AsterionMotors.mecanumDrive(Constants.DrivingAdjustment, 0, 0, hardwareMap);
+            AsterionMotors.mecanumDrive(Constants.DrivingAdjustment, 0, 0, false);
         } else if(gamepad1.dpad_right) {
-            AsterionMotors.mecanumDrive(0, Constants.DrivingAdjustment, 0, hardwareMap);
+            AsterionMotors.mecanumDrive(0, Constants.DrivingAdjustment, 0, false);
         } else if(gamepad1.dpad_left) {
-            AsterionMotors.mecanumDrive(0, -Constants.DrivingAdjustment, 0, hardwareMap);
+            AsterionMotors.mecanumDrive(0, -Constants.DrivingAdjustment, 0, false);
+        }
+
+        if(gamepad2.a && !aButtonPreviousState) {
+            DroneLauncher.setPosition(20);
+        }
+
+        if(gamepad2.b && !bButtonPreviousState) {
+            DroneLauncher.setPosition(0);
         }
 
         aButtonPreviousState = gamepad2.a;
@@ -115,7 +126,8 @@ public class MecanumDrive extends OpMode {
 
         ActuatorMotors.moveAngle(angle);
         ActuatorMotors.moveLift(lift);
-        telemetry.addData("Battery Voltage", Battery.getVoltage());
+        AsterionMotors.mecanumDrive(drive, strafe, twist, true);
+
     }
 
     @Override
