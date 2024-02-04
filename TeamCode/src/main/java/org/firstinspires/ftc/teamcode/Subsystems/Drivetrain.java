@@ -30,10 +30,10 @@ public class Drivetrain {
         RearLeft = hardwareMap.get(DcMotor.class, Constants.BackLeftID);
         RearRight = hardwareMap.get(DcMotor.class, Constants.BackRightID);
 
-        FrontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        FrontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        RearLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        RearRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        FrontLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        FrontRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        RearLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        RearRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         AsterionMotors = new DcMotor[]{FrontLeft, FrontRight, RearLeft, RearRight};
     }
@@ -70,55 +70,19 @@ public class Drivetrain {
         }
     }
 
-    public void mecanumDrive(double drive, double strafe, double twist, boolean advancedMode) {
-        if (!advancedMode) {
-            double[] speeds = {
-                    (drive - strafe - twist),
-                    (drive + strafe + twist),
-                    (drive + strafe - twist),
-                    (drive - strafe + twist)
-            };
+    public void mecanumDrive(double drive, double strafe, double twist) {
 
-            double max = Math.abs(speeds[0]);
-            for (int i = 0; i < speeds.length; i++) {
-                if (max < Math.abs(speeds[i])) max = Math.abs(speeds[i]);
-            }
+        double[] thetaSpeeds = {
+                (drive + twist + strafe),
+                (drive - twist - strafe),
+                (drive + twist - strafe),
+                (drive - twist + strafe)
+        };
 
-            if (max > 1) {
-                for (int i = 0; i < speeds.length; i++) speeds[i] /= max;
-            }
-
-            AsterionMotors[0].setPower(speeds[0]);
-            AsterionMotors[1].setPower(speeds[1]);
-            AsterionMotors[2].setPower(speeds[2]);
-            AsterionMotors[3].setPower(speeds[3]);
-        } else {
-            double theta = Math.atan2(drive, strafe);
-            double power = Math.hypot(strafe, drive);
-
-            double sin = Math.sin(theta - Math.PI / 4);
-            double cos = Math.cos(theta - Math.PI / 4);
-            double maxPower = Math.max(Math.abs(sin), Math.abs(cos));
-
-            double[] thetaSpeeds = {
-                    (power * cos / maxPower + twist),
-                    (power * sin / maxPower - twist),
-                    (power * sin / maxPower + twist),
-                    (power * cos / maxPower - twist)
-            };
-
-            if ((power + Math.abs(twist)) > 1) {
-                thetaSpeeds[0] /= power + twist;
-                thetaSpeeds[1] /= power + twist;
-                thetaSpeeds[2] /= power + twist;
-                thetaSpeeds[3] /= power + twist;
-
-                AsterionMotors[0].setPower(thetaSpeeds[0]);
-                AsterionMotors[1].setPower(thetaSpeeds[1]);
-                AsterionMotors[2].setPower(thetaSpeeds[2]);
-                AsterionMotors[3].setPower(thetaSpeeds[3]);
-            }
-        }
+        AsterionMotors[0].setPower(thetaSpeeds[0]);
+        AsterionMotors[1].setPower(thetaSpeeds[1]);
+        AsterionMotors[2].setPower(thetaSpeeds[2]);
+        AsterionMotors[3].setPower(thetaSpeeds[3]);
     }
 
     public void tankDrive(double leftDriveAxis, double rightDriveAxis, HardwareMap aHardwareMap) {
@@ -138,5 +102,12 @@ public class Drivetrain {
         AsterionMotors[1].setPower(speeds[0]);
         AsterionMotors[2].setPower(speeds[1]);
         AsterionMotors[3].setPower(speeds[0]);
+    }
+
+    public void power(double power) {
+        AsterionMotors[0].setPower(power);
+        AsterionMotors[1].setPower(power);
+        AsterionMotors[2].setPower(power);
+        AsterionMotors[3].setPower(power);
     }
 }

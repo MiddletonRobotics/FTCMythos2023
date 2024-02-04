@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import java.util.ArrayList;
 
 import com.qualcomm.hardware.lynx.LynxModule;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -10,6 +11,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.hardware.Blinker;
 
+import org.checkerframework.checker.units.qual.Angle;
 import org.firstinspires.ftc.teamcode.Subsystems.Lift;
 import org.firstinspires.ftc.teamcode.Utilities.Color;
 import org.firstinspires.ftc.teamcode.Utilities.Constants.Constants;
@@ -27,6 +29,9 @@ public class MecanumDrive extends OpMode {
     private LynxModule ExpansionHub;
     private VoltageSensor Battery;
     private Servo DroneLauncher;
+
+    private DcMotor AngleMotor;
+    private DcMotor LiftMotor;
 
     double ForwardSpeedReduction = 0.6;
     double StrafeSpeedReduction = 0.6;
@@ -54,6 +59,12 @@ public class MecanumDrive extends OpMode {
         ExpansionHub = Color.getLynxModule(hardwareMap, Constants.ExpansionHubID);
         Battery = hardwareMap.get(VoltageSensor.class, Constants.ControlHubID);
         LED = hardwareMap.get(Blinker.class, Constants.ControlHubID);
+
+        AngleMotor = hardwareMap.get(DcMotor.class, Constants.AngleMotorID);
+        LiftMotor = hardwareMap.get(DcMotor.class, Constants.LiftMotorID);
+
+        AngleMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        LiftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         DroneLauncher = hardwareMap.get(Servo.class, Constants.DroneLauncherID);
 
@@ -98,35 +109,47 @@ public class MecanumDrive extends OpMode {
         leftJoystickButtonPreviousState = gamepad1.left_stick_button;
 
         double drive = gamepad1.left_stick_y * ForwardSpeedReduction;
-        double strafe = gamepad1.left_stick_x * StrafeSpeedReduction;
-        double twist = gamepad1.right_stick_x * TwistSpeedReduction;
-        double lift = gamepad2.right_stick_y;
-        double angle = gamepad2.left_stick_y;
+        double strafe = -gamepad1.left_stick_x * StrafeSpeedReduction;
+        double twist = -gamepad1.right_stick_x * TwistSpeedReduction;
 
         if(gamepad1.dpad_up) {
-            AsterionMotors.mecanumDrive(-Constants.DrivingAdjustment, 0,0, false);
+            AsterionMotors.mecanumDrive(-Constants.DrivingAdjustment, 0,0);
         } else if(gamepad1.dpad_down) {
-            AsterionMotors.mecanumDrive(Constants.DrivingAdjustment, 0, 0, false);
+            AsterionMotors.mecanumDrive(Constants.DrivingAdjustment, 0, 0);
         } else if(gamepad1.dpad_right) {
-            AsterionMotors.mecanumDrive(0, Constants.DrivingAdjustment, 0, false);
+            AsterionMotors.mecanumDrive(0, Constants.DrivingAdjustment, 0);
         } else if(gamepad1.dpad_left) {
-            AsterionMotors.mecanumDrive(0, -Constants.DrivingAdjustment, 0, false);
+            AsterionMotors.mecanumDrive(0, -Constants.DrivingAdjustment, 0);
         }
 
-        if(gamepad2.a && !aButtonPreviousState) {
-            DroneLauncher.setPosition(20);
+        if(gamepad2.x && !aButtonPreviousState) {
+            DroneLauncher.setPosition(5);
         }
 
-        if(gamepad2.b && !bButtonPreviousState) {
+        if(gamepad2.y && !bButtonPreviousState) {
             DroneLauncher.setPosition(0);
         }
 
-        aButtonPreviousState = gamepad2.a;
-        bButtonPreviousState = gamepad2.b;
+        aButtonPreviousState = gamepad2.x;
+        bButtonPreviousState = gamepad2.y;
 
-        ActuatorMotors.moveAngle(angle);
-        ActuatorMotors.moveLift(lift);
-        AsterionMotors.mecanumDrive(drive, strafe, twist, true);
+        if(gamepad2.left_stick_y > 0.1) {
+            AngleMotor.setPower(0.3);
+        } else if(gamepad2.left_stick_y < -0.1) {
+            AngleMotor.setPower(-0.3);
+        } else if(gamepad2.left_stick_y < 0.1 && gamepad2.left_stick_y > -0.1) {
+            AngleMotor.setPower(0);
+        }
+
+        if(gamepad2.right_stick_y > 0.1) {
+            LiftMotor.setPower(0.6);
+        } else if (gamepad2.right_stick_y < -0.1) {
+            LiftMotor.setPower(-0.8);
+        } else if(gamepad2.right_stick_y < 0.1 && gamepad2.right_stick_y > -0.1) {
+            LiftMotor.setPower(0);
+        }
+
+        AsterionMotors.mecanumDrive(drive, strafe, twist);
 
     }
 
