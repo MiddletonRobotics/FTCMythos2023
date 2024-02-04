@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Subsystems;
+package org.firstinspires.ftc.teamcode.Autonomous;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -17,7 +17,7 @@ import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 
 // The detector needs to implement VisionProcessor to be be inserted into the Vision Portal and needs to implement CameraStreamSource to send images to the DS
-public class VisionColorDetector implements VisionProcessor, CameraStreamSource {
+class VisionColorDetector implements VisionProcessor, CameraStreamSource {
 
     // The values for red and blue are only used by the detector
     private static final Scalar BLUE_HSV_HIGH = new Scalar(130, 255, 255);
@@ -45,7 +45,7 @@ public class VisionColorDetector implements VisionProcessor, CameraStreamSource 
 
     // We don't expect the zones to change and they don't need to be accessible outside the detector
     private final Rect leftZone;
-    private final Rect middleZone;
+    private final Rect rightZone;
 
     // These enums need to be public so the robot code can use them
     public enum TargetColor {
@@ -60,7 +60,7 @@ public class VisionColorDetector implements VisionProcessor, CameraStreamSource 
 
     public enum Detection {
         LEFT,
-        MIDDLE,
+        RIGHT,
         NONE,
     }
 
@@ -88,12 +88,12 @@ public class VisionColorDetector implements VisionProcessor, CameraStreamSource 
     private boolean confidentDetection;
 
     // Initialize all the values
-    public VisionColorDetector(Telemetry telemetry, TargetColor targetColor, ViewMode viewMode, Rect leftZone, Rect middleZone) {
+    public VisionColorDetector(Telemetry telemetry, TargetColor targetColor, ViewMode viewMode, Rect leftZone, Rect rightZone) {
         this.telemetry = telemetry;
         this.viewMode = viewMode;
         this.targetColor = targetColor;
         this.leftZone = leftZone;
-        this.middleZone = middleZone;
+        this.rightZone = rightZone;
         rawFrame = new Mat();
         frameHSV = new Mat();
         red1Thresh = new Mat();
@@ -147,7 +147,7 @@ public class VisionColorDetector implements VisionProcessor, CameraStreamSource 
 
         // Create submats for each detection zone
         leftFrame = thresh.submat(leftZone);
-        rightFrame = thresh.submat(middleZone);
+        rightFrame = thresh.submat(rightZone);
 
         // Find average brightness of each detection zone
         leftMean = Core.mean(leftFrame).val[0];
@@ -160,7 +160,7 @@ public class VisionColorDetector implements VisionProcessor, CameraStreamSource 
             if (leftMean == max) {
                 detection = Detection.LEFT;
             } else if (rightMean == max) {
-                detection = Detection.MIDDLE;
+                detection = Detection.RIGHT;
             }
         } else {
             // If no zone is above threshold, detection is NONE
@@ -214,7 +214,7 @@ public class VisionColorDetector implements VisionProcessor, CameraStreamSource 
 
         // Draw red rectangles around each detection zone
         Imgproc.rectangle(result, leftZone, RED);
-        Imgproc.rectangle(result, middleZone, RED);
+        Imgproc.rectangle(result, rightZone, RED);
 
         // Use blue if not confident, green if confident
         Scalar detectColor;
@@ -229,8 +229,8 @@ public class VisionColorDetector implements VisionProcessor, CameraStreamSource 
             case LEFT:
                 Imgproc.rectangle(result, leftZone, detectColor);
                 break;
-            case MIDDLE:
-                Imgproc.rectangle(result, middleZone, detectColor);
+            case RIGHT:
+                Imgproc.rectangle(result, rightZone, detectColor);
                 break;
         }
 
